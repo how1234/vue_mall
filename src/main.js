@@ -3,7 +3,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import GlobalComponents from './components/globalComponents'
+
+
+
 Vue.config.productionTip = false
+Vue.use(GlobalComponents)
 
 new Vue({
   router,
