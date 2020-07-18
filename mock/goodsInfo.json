@@ -5,13 +5,25 @@
     {
       "productId": "1",
       "productName": "mi 9",
-      "productPrice": 2499,
+      "productPrice": 599,
       "productImg": "1.jpg"
     },
     {
       "productId": "2",
       "productName": "mi 9",
       "productPrice": 2499,
+      "productImg": "2.jpg"
+    },
+    {
+      "productId": "3",
+      "productName": "mi 9",
+      "productPrice": 399,
+      "productImg": "1.jpg"
+    },
+    {
+      "productId": "4",
+      "productName": "mi 9",
+      "productPrice": 699,
       "productImg": "2.jpg"
     }
   ]

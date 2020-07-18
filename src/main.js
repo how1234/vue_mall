@@ -4,10 +4,20 @@ import router from './router'
 import store from './store'
 
 import GlobalComponents from './components/globalComponents'
+import VueLazyLoad from 'vue-lazyload'
+
 
 
 
 Vue.config.productionTip = false
+Vue.use(VueLazyLoad,{
+  loading:getLoadingFile()
+  
+})
+
+function getLoadingFile(){
+  return require("../static/loading-svg/loading-bars.svg");
+}
 Vue.use(GlobalComponents)
 
 new Vue({
