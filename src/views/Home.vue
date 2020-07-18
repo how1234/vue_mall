@@ -87,7 +87,7 @@
 
 <script>
 // @ is an alias to /src
-import axios from "axios";
+
 
 export default {
   name: "Home",
@@ -139,7 +139,7 @@ export default {
       return require("../../static/" + picName);
     },
     getGoodsInfo() {
-      axios.get("/api/goodsInfo").then(res => {
+      this.axios.get("/api/goodsInfo").then(res => {
         let results = res.data.results;
 
         this.goodsList = results;
