@@ -1,7 +1,9 @@
 <template>
   <div class="home">
     <nav-header></nav-header>
-    <nav-breadcrumb></nav-breadcrumb>
+    <nav-breadcrumb>
+      <span>Goods</span>
+    </nav-breadcrumb>
     <div class="accessory-result-page accessory-page">
   <div class="container">
     <div class="filter-nav">
@@ -35,49 +37,13 @@
       <div class="accessory-list-wrap">
         <div class="accessory-list col-4">
           <ul>
-            <li>
+            <li v-for="item in goodsList" :key="item.productId">
               <div class="pic">
-                <a href="#"><img src="static/1.jpg" alt=""></a>
+                <a href="#"><img :src="getImgUrl(item.productImg)" alt=""></a>
               </div>
               <div class="main">
-                <div class="name">XX</div>
-                <div class="price">999</div>
-                <div class="btn-area">
-                  <a href="javascript:;" class="btn btn--m">加入购物车</a>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="pic">
-                <a href="#"><img src="static/2.jpg" alt=""></a>
-              </div>
-              <div class="main">
-                <div class="name">XX</div>
-                <div class="price">1000</div>
-                <div class="btn-area">
-                  <a href="javascript:;" class="btn btn--m">加入购物车</a>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="pic">
-                <a href="#"><img src="static/3.jpg" alt=""></a>
-              </div>
-              <div class="main">
-                <div class="name">XX</div>
-                <div class="price">500</div>
-                <div class="btn-area">
-                  <a href="javascript:;" class="btn btn--m">加入购物车</a>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="pic">
-                <a href="#"><img src="static/4.jpg" alt=""></a>
-              </div>
-              <div class="main">
-                <div class="name">XX</div>
-                <div class="price">2499</div>
+                <div class="name">{{item.productName}}</div>
+                <div class="price">{{item.productPrice}}</div>
                 <div class="btn-area">
                   <a href="javascript:;" class="btn btn--m">加入购物车</a>
                 </div>
@@ -95,10 +61,36 @@
 
 <script>
 // @ is an alias to /src
-
+import axios from 'axios'
 
 
 export default {
   name: 'Home',
+  data(){
+    return {
+      goodsList : []
+    }
+  },
+  mounted:function(){
+    this.getGoodsInfo()
+  
+  },
+
+  methods:{
+    //https://stackoverflow.com/questions/40491506/vue-js-dynamic-images-not-working
+    getImgUrl(picName){
+      return require('../../static/' + picName)
+    },
+    getGoodsInfo(){
+      axios.get('/api/goodsInfo').then((res) => {
+ 
+        let results = res.data.results
+ 
+        this.goodsList = results
+          console.log(this.goodsList)
+      })
+
+    }
+  }
 }
 </script>

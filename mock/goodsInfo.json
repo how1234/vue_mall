@@ -1,0 +1,18 @@
+{
+  "status": "0",
+  "msg": "error string",
+  "results": [
+    {
+      "productId": "1",
+      "productName": "mi 9",
+      "productPrice": 2499,
+      "productImg": "1.jpg"
+    },
+    {
+      "productId": "2",
+      "productName": "mi 9",
+      "productPrice": 2499,
+      "productImg": "2.jpg"
+    }
+  ]
+}
