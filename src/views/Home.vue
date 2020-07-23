@@ -59,7 +59,7 @@
                 <li v-for="item in goodsList" :key="item.productId">
                   <div class="pic">
                     <a href="#"
-                      ><img v-lazy="getImgUrl(item.productImg)" alt=""
+                      ><img v-lazy="getImgUrl(item.productImages)" alt=""
                     /></a>
                   </div>
                   <div class="main">
@@ -136,11 +136,11 @@ export default {
       this.overLayFlag = false;
     },
     getImgUrl(picName) {
-      return require("../../static/" + picName);
+      return require("../../public/static/" + picName);
     },
     getGoodsInfo() {
-      this.axios.get("/api/goodsInfo").then(res => {
-        let results = res.data.results;
+      this.axios.get("/api/goods").then(res => {
+        let results = res.data.result.list;
 
         this.goodsList = results;
       });

@@ -1,52 +1,58 @@
-var express = require('express')
+var express = require("express");
 
-var router = express.Router()
+var router = express.Router();
 
-var mongoose = require('mongoose')
-var Goods = require('../models/goods')
-var Admin = mongoose.mongo.Admin
-console.log(Goods)
+var mongoose = require("mongoose");
+var Goods = require("../models/goods");
+var Admin = mongoose.mongo.Admin;
+
+
 //连接数据库
-let connection = mongoose.createConnection('mongodb://root:654321@127.0.0.1:27017/vue_mall')
+mongoose.connect("mongodb://root:654321@127.0.0.1:27017/vue_mall", {
+  useNewUrlParser: true
+});
 
-connection.on('connected',function(){
-  console.log("Mongo Db connects")
-  new Admin(connection.db).listDatabases(function(err,res){
-    
-    var allDatabases = res.databases
-    console.log(allDatabases[4])
-  })
-})
+mongoose.connection.on("open", function() {
+  console.log("MongoDB connected success.");
+  new Admin(mongoose.connection.db).listDatabases(function(err, res) {
+    var allDatabases = res.databases;
+    console.log(allDatabases[4]);
+  });
+}); 
 
+mongoose.connection.on("error", function() {
+  console.log("MongoDB connected fail.");
+});
 
-connection.on('error',function(){
-  console.log("Connection Error")
-})
+mongoose.connection.on("disconnected", function() {
+  console.log("MongoDB connected disconnected.");
+});
 
-connection.on('disconnected',function(){
-  console.log("Mongo Db disconnected")
-})
+router.get("/", function(req, res, next) {
+  Goods.create({
+    productId: "201710003",
+    productName: "平衡车",
+    salePrice: 1999,
+    productImage: "pingheng.jpg"
+  });
 
-router.get('/',function(req,res,next){
-  Goods.find({},function(err,doc){
-    console.log('hi')
-    if(err){
+  Goods.find({}, function(err, doc) {
+    if (err) {
       res.json({
-        status:'1',
-        msg:err.message
-      })
-    }else{
+        status: "1",
+        msg: err.message
+      });
+    } else {
       res.json({
-        status:'0',
-        msg:'',
-        result:{
-          count:doc.length,
-          list:doc
+        status: "0",
+        msg: "",
+        result: {
+          count: doc.length,
+          list: doc
         }
-      })
+      });
     }
-  })
-})
-
+  });
+});
 
 module.exports = router;
