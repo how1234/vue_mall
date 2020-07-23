@@ -4,7 +4,7 @@ var router = express.Router();
 
 var mongoose = require("mongoose");
 var Good = require("../models/goods");
-var User = require('../models/users')
+var User = require("../models/users");
 var Admin = mongoose.mongo.Admin;
 
 //连接数据库
@@ -94,48 +94,74 @@ router.get("/", function(req, res) {
 router.post("/addToCart", function(req, res) {
   let userId = "100000077";
   let productId = req.body.productId;
-
-
   User.findOne(
     {
       userId: userId
     },
-    function(err1, userDoc) {
-      if (err1) {
+    function(err, userDoc) {
+      if (err) {
         res.json({
           status: "1",
-          msg: err1.message
+          msg: err.message
         });
       } else {
+        console.log("userDoc" + userDoc)
         if (userDoc) {
-          Good.findOne({ productId: productId }, function(err, doc) {
-            if (err) {
-              res.json({
-                status: "1",
-                msg: err.message
-              });
-            } else {
-              if(doc){
-                doc.productNumber = 1
-                doc.checked = 1
-                userDoc.cartList.push(doc)
-                userDoc.save(function(err2,doc2){
-                  if (err2) {
-                    res.json({
-                      status: "1",
-                      msg: err2.message
-                    })
-                    }else{
-                      res.json({
-                        status: "1",
-                        msg:"",
-                        result:doc2
-                      })
-                    }
-                })
-              }
+          let goodsItem = "";
+          userDoc.cartList.forEach(item => {
+            if (item.productId === productId) {
+              goodsItem = item;
+              item.productNum++
             }
           });
+          if (!goodsItem) {
+          
+            Good.findOne({ productId: productId }, function(err, doc) {
+              if (err) {
+                res.json({
+                  status: "1",
+                  msg: err.message
+                });
+              } else {
+                if (doc) {
+                  console.log(doc)
+                  doc.productNum = 1;
+                  doc.checked = 1;
+                  userDoc.cartList.push(doc);
+                  userDoc.save(function(err2, doc2) {
+                    if (err2) {
+                      res.json({
+                        status: "1",
+                        msg: err2.message
+                      });
+                    } else {
+                      res.json({
+                        status: "0",
+                        msg: "",
+                        result: doc2
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          }else{
+            userDoc.save(function(err2, doc2) {
+              if (err2) {
+                res.json({
+                  status: "1",
+                  msg: err2.message
+                });
+              } else {
+                res.json({
+                  status: "0",
+                  msg: "",
+                  result: doc2
+                });
+              }
+            });
+          }
+          
         }
       }
     }
