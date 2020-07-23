@@ -32,9 +32,29 @@ router.get("/", function(req, res, next) {
   let page = parseInt(req.param("page"))
   let pageSize = parseInt(req.param("pageSize"))
   let sort = req.param("sort") ? parseInt(req.param("sort")) : 1
+  let priceRange = req.param("priceRange")
   let skipNum = (page-1) * pageSize 
   let params = {}
+  
+  let lowerPrice = ''
+  let upperPrice = ''
 
+  
+  if(priceRange !== 'all'){
+    switch(priceRange){
+      case '0': lowerPrice = 0;upperPrice= 100;break;
+      case '1': lowerPrice = 100;upperPrice = 500;break;
+      case '2': lowerPrice = 500;upperPrice = 1000;break;
+      case '3': lowerPrice = 1000;upperPrice = 5000;break;
+    }
+    params = {
+      salePrice:{
+        $gt:lowerPrice,
+        $lte:upperPrice
+      }
+    }
+  }
+  
   let GoodsModel = Goods.find(params).skip(skipNum).limit(pageSize)
   GoodsModel.sort({"salePrice":sort})
 

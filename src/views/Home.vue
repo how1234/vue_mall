@@ -33,15 +33,15 @@
               <dd>
                 <a
                   href="javascript:void(0)"
-                  :class="{ cur: checked === 'all' }"
-                  @click="clickPriceFilter('active')"
+                  :class="{ cur: priceRangeChecked === 'all' }"
+                  @click="clickPriceFilter('all')"
                   >All</a
                 >
               </dd>
               <dd v-for="(el, index) in priceFilter" :key="index">
                 <a
                   href="javascript:void(0)"
-                  :class="{ cur: index === checked }"
+                  :class="{ cur: index === priceRangeChecked }"
                   @click="clickPriceFilter(index)"
                   >{{ el.startPrice }}- {{ el.endPrice }}</a
                 >
@@ -115,16 +115,16 @@ export default {
         },
         {
           startPrice: "1000",
-          endPrice: "2000"
+          endPrice: "5000"
         }
       ],
-      checked: "all",
       filterBy: false,
       overLayFlag: false,
       sortFlag: true,
       page: 1,
       pageSize: 8,
-      busy: true
+      busy: true,
+      priceRangeChecked:"all"
     };
   },
 
@@ -134,8 +134,9 @@ export default {
 
   methods: {
     //https://stackoverflow.com/questions/40491506/vue-js-dynamic-images-not-working
-    async clickPriceFilter(activeIndex) {
-      this.checked = activeIndex;
+    clickPriceFilter(activeIndex) {
+      this.priceRangeChecked = activeIndex;
+      this.getGoodsInfo()
     },
     filterShow() {
       this.filterBy = true;
@@ -152,7 +153,8 @@ export default {
       let param = {
         page: this.page,
         pageSize: this.pageSize,
-        sort: this.sortFlag ? 1 : -1
+        sort: this.sortFlag ? 1 : -1,
+        priceRange:this.priceRangeChecked
       };
       this.axios
         .get("/api/goods", {
