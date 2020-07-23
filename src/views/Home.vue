@@ -9,10 +9,10 @@
         <div class="filter-nav">
           <span class="sortby">Sort by:</span>
           <a href="javascript:void(0)" class="default cur">Default</a>
-          <a href="javascript:void(0)" class="price"
+          <a href="javascript:void(0)" class="price" @click="sortGoods"
             >Price
             <svg class="icon icon-arrow-short">
-              <use xlink:href="#icon-arrow-short"></use></svg
+              <use xlink:shref="#icon-arrow-short"></use></svg
           ></a>
           <a
             href="javascript:void(0)"
@@ -59,18 +59,25 @@
                 <li v-for="item in goodsList" :key="item.productId">
                   <div class="pic">
                     <a href="#"
-                      ><img v-lazy="getImgUrl(item.productImages)" alt=""
+                      ><img v-lazy="getImgUrl(item.productImage)" alt=""
                     /></a>
                   </div>
                   <div class="main">
                     <div class="name">{{ item.productName }}</div>
-                    <div class="price">{{ item.productPrice }}</div>
+                    <div class="price">{{ item.salePrice }}</div>
                     <div class="btn-area">
                       <a href="javascript:;" class="btn btn--m">Add to cart</a>
                     </div>
                   </div>
                 </li>
               </ul>
+            </div>
+            <div
+              v-infinite-scroll="loadMore"
+              infinite-scroll-disabled="busy"
+              infinite-scroll-distance="30"
+            >
+              load more
             </div>
           </div>
           <div
@@ -87,7 +94,6 @@
 
 <script>
 // @ is an alias to /src
-
 
 export default {
   name: "Home",
@@ -114,7 +120,11 @@ export default {
       ],
       checked: "all",
       filterBy: false,
-      overLayFlag: false
+      overLayFlag: false,
+      sortFlag: true,
+      page: 1,
+      pageSize: 8,
+      busy: true
     };
   },
 
@@ -138,12 +148,50 @@ export default {
     getImgUrl(picName) {
       return require("../../public/static/" + picName);
     },
-    getGoodsInfo() {
-      this.axios.get("/api/goods").then(res => {
-        let results = res.data.result.list;
-
-        this.goodsList = results;
-      });
+    getGoodsInfo(flag = false) {
+      let param = {
+        page: this.page,
+        pageSize: this.pageSize,
+        sort: this.sortFlag ? 1 : -1
+      };
+      this.axios
+        .get("/api/goods", {
+          params: param
+        })
+        .then(res => {
+          if (res.data.status == 0) {
+            //分页情况
+            if (flag) {
+              this.goodsList = this.goodsList.concat(res.data.result.list);
+              //数据库是否还有多余数据
+              if (res.data.result.count == 0) {
+                //禁止动态加载
+                this.busy = true;
+              } else {
+                this.busy = false;
+              }
+            } else {
+              this.goodsList = res.data.result.list;
+              this.busy = false;
+            }
+          } else {
+            this.goodsList = [];
+           
+          }
+        });
+    },
+    sortGoods() {
+      this.sortFlag = !this.sortFlag;
+      this.page = 1;
+      this.getGoodsInfo();
+    },
+    loadMore() {
+      //关闭滚动加载
+      this.busy = true;
+      setTimeout(() => {
+        this.page++;
+        this.getGoodsInfo(true);
+      }, 500);
     }
   }
 };

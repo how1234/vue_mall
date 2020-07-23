@@ -29,14 +29,17 @@ mongoose.connection.on("disconnected", function() {
 });
 
 router.get("/", function(req, res, next) {
-  Goods.create({
-    productId: "201710003",
-    productName: "平衡车",
-    salePrice: 1999,
-    productImage: "pingheng.jpg"
-  });
+  let page = parseInt(req.param("page"))
+  let pageSize = parseInt(req.param("pageSize"))
+  let sort = req.param("sort") ? parseInt(req.param("sort")) : 1
+  let skipNum = (page-1) * pageSize 
+  let params = {}
 
-  Goods.find({}, function(err, doc) {
+  let GoodsModel = Goods.find(params).skip(skipNum).limit(pageSize)
+  GoodsModel.sort({"salePrice":sort})
+
+
+  GoodsModel.exec(function(err, doc) {
     if (err) {
       res.json({
         status: "1",
