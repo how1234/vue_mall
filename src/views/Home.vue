@@ -66,7 +66,7 @@
                     <div class="name">{{ item.productName }}</div>
                     <div class="price">{{ item.salePrice }}</div>
                     <div class="btn-area">
-                      <a href="javascript:;" class="btn btn--m">Add to cart</a>
+                      <a href="javascript:;" class="btn btn--m" @click="addToCart(item.productId)">Add to cart</a>
                     </div>
                   </div>
                 </li>
@@ -194,6 +194,20 @@ export default {
         this.page++;
         this.getGoodsInfo(true);
       }, 500);
+    },
+    addToCart(productId){
+      this.axios.post('/api/goods/addToCart',{
+        productId
+      }).then((res) =>{
+
+        if(res.data.status == 0){
+          
+          alert('success')
+        }else{
+          console.log(res)
+          alert('error')
+        }
+      })
     }
   }
 };
