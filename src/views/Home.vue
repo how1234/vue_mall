@@ -88,10 +88,29 @@
         </div>
       </div>
     </div>
+    <modal :modalShow="errorModalShow" v-on:closeModal="closeModal">
+      <p slot="message"> Please login!</p>
+      <div slot="btnGroup">
+        <button class="btn btn--m" @click="closeModal">Close</button>
+      </div>
+    </modal>
+
+    <modal :modalShow="successModalShow" v-on:closeModal="closeModal">
+      <p slot="message"> Adding success</p>
+      <div slot="btnGroup">
+        <button class="btn btn--m" @click="closeModal">Close</button>
+      </div>
+    </modal>
+
     <nav-footer></nav-footer>
   </div>
 </template>
-
+<style scoped>
+.btn:hover{
+  background-color:#ee7a23;
+  transition: all .3s ease-out
+}
+</style>
 <script>
 // @ is an alias to /src
 
@@ -124,7 +143,9 @@ export default {
       page: 1,
       pageSize: 8,
       busy: true,
-      priceRangeChecked:"all"
+      priceRangeChecked:"all",
+      errorModalShow:false,
+      successModalShow:false
     };
   },
 
@@ -201,13 +222,16 @@ export default {
       }).then((res) =>{
 
         if(res.data.status == 0){
-          
-          alert('success')
+          this.successModalShow = true
         }else{
-          console.log(res)
-          alert('error')
+          this.errorModalShow = true
+          
         }
       })
+    },
+    closeModal(){
+      this.errorModalShow= false
+      this.successModalShow = false
     }
   }
 };

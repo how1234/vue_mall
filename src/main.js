@@ -8,7 +8,6 @@ import GlobalComponents from './components/globalComponents'
 import VueLazyload from 'vue-lazyload'
 import infiniteScroll from 'vue-infinite-scroll'
 
-
 Vue.config.productionTip = false
 Vue.prototype.axios = axios
 
