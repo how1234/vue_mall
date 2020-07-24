@@ -30,8 +30,8 @@
             <a href="javascript:void(0)"  class="navbar-link" v-text="nickName" v-if="nickName"></a>
   
             
-            <a href="javascript:void(0)" class="navbar-link" @click="loginPopUp">Login</a>
-            <a href="javascript:void(0)" class="navbar-link">Logout</a>
+            <a href="javascript:void(0)" class="navbar-link" @click="loginPopUp" v-show="!nickName">Login</a>
+            <a href="javascript:void(0)" class="navbar-link" @click="logout" v-show="nickName">Logout</a>
             <div class="navbar-cart-container">
               <span class="navbar-cart-count"></span>
               <a class="navbar-link navbar-cart-link" href="/#/cart">
@@ -123,6 +123,12 @@ export default {
           this.errorShow = false
           this.loginModalShowFlag = false
         }
+      })
+    },
+    logout(){
+      this.axios.post("/api/users/logout",{}).then( (res) => {
+        console.log(res)
+        this.nickName=''
       })
     },
     loginPopUp(){
