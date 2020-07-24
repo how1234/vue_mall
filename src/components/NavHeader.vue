@@ -104,8 +104,18 @@ export default {
       }
     };
   },
+  mounted(){
+    this.checkedLogin()
+  },
   methods:{
-
+    checkedLogin(){
+      this.axios.get('/api/users/loginValidation').then((res)=>{
+        if(res.data.status == 0){
+          this.nickName = res.data.data
+        }
+  
+      })
+    },
     login(){
       if(!this.userName || !this.userPwd){
         this.errorShow = true

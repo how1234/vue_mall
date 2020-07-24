@@ -24,6 +24,11 @@ router.post("/login", function(req, res) {
             path: "/",
             maxAge: 1000 * 60 * 60
           });
+          res.cookie("userName", doc.userName, {
+            //Cookies sent to clients can be set for a specific path, not just a domain. 
+            path: "/",
+            maxAge: 1000 * 60 * 60
+          });
         }
         let result = {
           userName: doc.userName
@@ -42,5 +47,13 @@ router.post("/logout",(req,res)=>{
     maxAge:-1
   })
   res.json(getJsonFile(true,'logout success',null))
+})
+
+router.get("/loginValidation",(req,res)=>{
+  if(req.cookies.userId){
+    res.json(getJsonFile(true,'already login',req.cookies.userName))
+  }else{
+    res.json(getJsonFile(false,'please login',null))
+  }
 })
 module.exports = router;

@@ -7,7 +7,7 @@ var ejs = require('ejs')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var goodsRouter = require('./routes/goods')
-
+var {getJsonFile} = require('./utils/index')
 
 var app = express();
 
@@ -22,6 +22,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
   
+
+//路由拦截
+
+app.use((req,res,next)=>{
+  if (req.cookies.userId){
+    next()
+  }else{
+      let url = req.originalUrl
+      if( (url.startsWith('/api/goods') && url !== '/api/goods/addToCart') || url.startsWith('/api/users/login')){
+        next()
+      }else{
+        res.json(getJsonFile(false,'Please login',null))
+      }
+    
+
+  }
+})
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/goods',goodsRouter)
