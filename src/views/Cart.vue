@@ -245,10 +245,25 @@ export default {
       cartList: [],
       modalShowFlag: false,
       deletedProductId: "",
-      selectAllFlag: true
+    
     };
   },
-  computed: {},
+  computed: {
+    selectAllFlag(){
+      
+      return this.checkedCount === this.cartList.length
+    },
+    checkedCount(){
+      let temp = 0
+      this.cartList.forEach(item => {
+        if (item.checked) {
+          temp++
+        }
+      });
+      return temp
+    }
+ 
+  },
   mounted() {
     this.init();
   },
@@ -257,12 +272,6 @@ export default {
       this.axios.get("/api/users/cartList").then(res => {
         if (res.data.status == 0) {
           this.cartList = res.data.data;
-
-          this.cartList.forEach(item => {
-            if (!item.checked) {
-              this.selectAllFlag = false;
-            }
-          });
         }
       });
     },
@@ -311,16 +320,16 @@ export default {
         });
     },
     checkAll() {
-      this.selectAllFlag = !this.selectAllFlag;
+      let flag = !this.selectAllFlag;
 
       this.axios
         .post("/api/users/checkAll", {
-          checkAll: this.selectAllFlag
+          checkAll: flag
         })
         .then(res => {
           if (res.data.status == 0) {
             this.cartList.forEach(item => {
-              item.checked = this.selectAllFlag;
+              item.checked = flag
             });
           }
         });
