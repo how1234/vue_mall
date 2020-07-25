@@ -115,6 +115,7 @@
 <script>
 // @ is an alias to /src
 
+
 export default {
   name: "Home",
   data() {
@@ -169,7 +170,7 @@ export default {
       this.overLayFlag = false;
     },
     getImgUrl(picName) {
-      return require("../../public/static/" + picName);
+      return require("@/../public/static/" + picName);
     },
     getGoodsInfo(flag = false) {
       let param = {
