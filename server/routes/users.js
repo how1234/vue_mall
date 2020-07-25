@@ -93,11 +93,15 @@ router.post("/delItem", (req, res) => {
 router.post("/editItem", (req, res) => {
   let userId = req.cookies.userId,
     productId = req.body.productId,
-    productNum = req.body.productNum;
+    productNum = req.body.productNum,
+    checked = req.body.checked
 
+  console.log(typeof checked)
+  console.log(typeof !!checked)
   User.update(
     { userId: userId, "cartList.productId": productId },
     //If you don't know the position of edited element, the '$' sign can be used.
+    { "cartList.$.checked": !!checked },
     { "cartList.$.productNum": productNum },
     (err, doc) => {
       if (err) {

@@ -106,7 +106,12 @@
               <li v-for="item in cartList" :key="item.productId">
                 <div class="cart-tab-1">
                   <div class="cart-item-check">
-                    <a href="javascipt:;" class="checkbox-btn item-check-btn">
+                    <a
+                      href="javascipt:;"
+                      class="checkbox-btn item-check-btn"
+                      :class="{ check: item.checked }"
+                      @click="editItemNum(item, 0, !item.checked)"
+                    >
                       <svg class="icon icon-ok">
                         <use xlink:href="#icon-ok"></use>
                       </svg>
@@ -129,11 +134,17 @@
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub" @click="editItemNum(item, -1)"
+                        <a
+                          class="input-sub"
+                          @click="editItemNum(item, -1, item.checked)"
                           >-</a
                         >
                         <span class="select-ipt">{{ item.productNum }}</span>
-                        <a class="input-add" @click="editItemNum(item, 1)">+</a>
+                        <a
+                          class="input-add"
+                          @click="editItemNum(item, 1, item.checked)"
+                          >+</a
+                        >
                       </div>
                     </div>
                   </div>
@@ -235,12 +246,14 @@ export default {
   },
   mounted() {
     this.init();
+ 
   },
   methods: {
     init() {
       this.axios.get("/api/users/cartList").then(res => {
         if (res.data.status == 0) {
           this.cartList = res.data.data;
+          console.log(this.cartList)
         }
       });
     },
@@ -270,22 +283,24 @@ export default {
           }
         });
     },
-    editItemNum(item,num){
-      let tempNum = parseInt(item.productNum) + num
-      if(tempNum < 1){
-        tempNum = 1
+    editItemNum(item, num, checked) {
+      let tempNum = parseInt(item.productNum) + num;
+      if (tempNum < 1) {
+        tempNum = 1;
         return;
       }
-      
-      this.axios.post('/api/users/editItem',{
-        productId:item.productId,
-        productNum: tempNum
-      }).then( (res) => {
-        console.log(res)
-      })
-      
-      item.productNum = tempNum
 
+      this.axios
+        .post("/api/users/editItem", {
+          productId: item.productId,
+          productNum: tempNum,
+          checked: checked
+        })
+        .then( ()=> {
+
+          item.productNum = tempNum;
+          item.checked = checked
+        });
     }
   }
 };

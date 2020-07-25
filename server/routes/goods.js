@@ -105,7 +105,7 @@ router.post("/addToCart", function(req, res) {
           msg: err.message
         });
       } else {
-        console.log("userDoc" + userDoc)
+        
         if (userDoc) {
           let goodsItem = "";
           userDoc.cartList.forEach(item => {
@@ -124,9 +124,8 @@ router.post("/addToCart", function(req, res) {
                 });
               } else {
                 if (doc) {
-                  console.log(doc)
                   doc.productNum = 1;
-                  doc.checked = 1;
+                  doc.checked = true;
                   userDoc.cartList.push(doc);
                   userDoc.save(function(err2, doc2) {
                     if (err2) {
