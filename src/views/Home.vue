@@ -98,6 +98,7 @@
     <modal :modalShow="successModalShow" v-on:closeModal="closeModal">
       <p slot="message"> Adding success</p>
       <div slot="btnGroup">
+        <router-link class="btn btn--m" href="javascript:;" to="/cart">Check Cart</router-link>
         <button class="btn btn--m" @click="closeModal">Close</button>
       </div>
     </modal>

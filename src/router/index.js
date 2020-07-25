@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-
+import Cart from '../views/Cart.vue'
 Vue.use(VueRouter)
 
   const routes = [
@@ -10,6 +10,11 @@ Vue.use(VueRouter)
     name: 'Home',
     component: Home
   },
+  {
+    path:'/cart',
+    name:'Cart',
+    component: Cart
+  }
 ]
 
 const router = new VueRouter({

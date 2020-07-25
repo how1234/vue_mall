@@ -64,12 +64,12 @@
                   </li>
                   <li class="regi_form_input noMargin">
                     <i class="icon IconPwd"></i>
-                    <input type="password" tabindex="2" v-model="userPwd" name="password"  class="regi_login_input regi_login_input_left login-input-no input_text" placeholder="Password" >
+                    <input type="password" tabindex="2" v-model="userPwd" name="password"  class="regi_login_input regi_login_input_left login-input-no input_text" placeholder="Password" @keyup.enter="login" >
                   </li>
                 </ul>
               </div>
               <div class="login-wrap">
-                <a href="javascript:;" class="btn-login" @click="login">Login </a>
+                <a href="javascript:;" class="btn-login" @click="login" >Login </a>
               </div>
             </div>
           </div>
@@ -82,6 +82,7 @@
 tr:last-child td {
   padding-bottom: 0;
 }
+
 </style>
 
 <script>

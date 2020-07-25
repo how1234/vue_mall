@@ -20,12 +20,12 @@ router.post("/login", function(req, res) {
       if (doc) {
         if (req.cookies !== doc.userId) {
           res.cookie("userId", doc.userId, {
-            //Cookies sent to clients can be set for a specific path, not just a domain. 
+            //Cookies sent to clients can be set for a specific path, not just a domain.
             path: "/",
             maxAge: 1000 * 60 * 60
           });
           res.cookie("userName", doc.userName, {
-            //Cookies sent to clients can be set for a specific path, not just a domain. 
+            //Cookies sent to clients can be set for a specific path, not just a domain.
             path: "/",
             maxAge: 1000 * 60 * 60
           });
@@ -41,19 +41,32 @@ router.post("/login", function(req, res) {
   });
 });
 
-router.post("/logout",(req,res)=>{
-  res.cookie('userId',"",{
-    path:'/',
-    maxAge:-1
-  })
-  res.json(getJsonFile(true,'logout success',null))
-})
+router.post("/logout", (req, res) => {
+  res.cookie("userId", "", {
+    path: "/",
+    maxAge: -1
+  });
+  res.json(getJsonFile(true, "logout success", null));
+});
 
-router.get("/loginValidation",(req,res)=>{
-  if(req.cookies.userId){
-    res.json(getJsonFile(true,'already login',req.cookies.userName))
-  }else{
-    res.json(getJsonFile(false,'please login',null))
+router.get("/loginValidation", (req, res) => {
+  if (req.cookies.userId) {
+    res.json(getJsonFile(true, "already login", req.cookies.userName));
+  } else {
+    res.json(getJsonFile(false, "please login", null));
   }
-})
+});
+
+router.get("/cartList", (req, res) => {
+  let userId = req.cookies.userId;
+  User.findOne({ userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, null));
+    } else { 
+      if (doc) {
+        res.json(getJsonFile(true, "get cart list success", doc.cartList));
+      }
+    }
+  });
+});
 module.exports = router;
