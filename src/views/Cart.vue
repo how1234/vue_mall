@@ -113,32 +113,43 @@
                     </a>
                   </div>
                   <div class="cart-item-pic">
-                    <img :src="getImgUrl(item.productImage)" :alt="item.productName"/>
+                    <img
+                      :src="getImgUrl(item.productImage)"
+                      :alt="item.productName"
+                    />
                   </div>
                   <div class="cart-item-title">
-                    <div class="item-name">{{item.productName}}</div>
+                    <div class="item-name">{{ item.productName }}</div>
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">{{item.salePrice}}</div>
+                  <div class="item-price">{{ item.salePrice }}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub">-</a>
-                        <span class="select-ipt">{{item.productNum}}</span>
-                        <a class="input-add">+</a>
+                        <a class="input-sub" @click="editItemNum(item, -1)"
+                          >-</a
+                        >
+                        <span class="select-ipt">{{ item.productNum }}</span>
+                        <a class="input-add" @click="editItemNum(item, 1)">+</a>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum * item.salePrice}}</div>
+                  <div class="item-price-total">
+                    {{ item.productNum * item.salePrice }}
+                  </div>
                 </div>
                 <div class="cart-tab-5">
-                  <div class="cart-item-opration" >
-                    <a href="javascript:;" class="item-edit-btn" @click="itemDelete(item.productId)">
+                  <div class="cart-item-opration">
+                    <a
+                      href="javascript:;"
+                      class="item-edit-btn"
+                      @click="itemDelete(item.productId)"
+                    >
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -177,7 +188,7 @@
     </div>
     <modal v-on:closeModal="modalClose" :modalShow="modalShowFlag">
       <p slot="message">Do you want to remove this item?</p>
-      <div slot="btnGroup" >
+      <div slot="btnGroup">
         <button class="btn btn--m" @click="itemDeleteConfirm">YES</button>
         <button class="btn btn--m" @click="modalClose">NO</button>
       </div>
@@ -218,8 +229,8 @@ export default {
   data() {
     return {
       cartList: [],
-      modalShowFlag:false,
-      deletedProductId:''
+      modalShowFlag: false,
+      deletedProductId: ""
     };
   },
   mounted() {
@@ -236,26 +247,45 @@ export default {
     getImgUrl(picName) {
       return require("@/../public/static/" + picName);
     },
-  
-    modalClose(){
-      this.modalShowFlag = false
+
+    modalClose() {
+      this.modalShowFlag = false;
     },
-    itemDelete(productId){
-      this.productId = productId
-      this.modalShowFlag = true
+    itemDelete(productId) {
+      this.productId = productId;
+      this.modalShowFlag = true;
     },
-    itemDeleteConfirm(){
-      this.axios.post('/api/users/delItem',{
-        productId:this.productId
-      }).then( (res)=>{
-        if(res.data.status == 0){
-          this.modalShowFlag = false
-          this.init()
-        }
+    itemDeleteConfirm() {
+      this.axios
+        .post("/api/users/delItem", {
+          productId: this.productId
+        })
+        .then(res => {
+          if (res.data.status == 0) {
+            this.modalShowFlag = false;
+            this.cartList = this.cartList.filter(
+              item => item.productId !== this.productId
+            );
+            this.productId = "";
+          }
+        });
+    },
+    editItemNum(item,num){
+      let tempNum = parseInt(item.productNum) + num
+      if(tempNum < 1){
+        tempNum = 1
+        return;
+      }
+      
+      this.axios.post('/api/users/editItem',{
+        productId:item.productId,
+        productNum: tempNum
+      }).then( (res) => {
+        console.log(res)
       })
       
+      item.productNum = tempNum
 
-      
     }
   }
 };

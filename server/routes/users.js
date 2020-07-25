@@ -73,22 +73,39 @@ router.get("/cartList", (req, res) => {
 //Delete the item of cart
 router.post("/delItem", (req, res) => {
   let userId = req.cookies.userId,
-  productId = req.body.productId;
-  
+    productId = req.body.productId;
+
   //The $pull operator removes from an existing array all instances of a value or values that match a specified condition.
   User.update(
     { userId: userId },
     { $pull: { cartList: { productId: productId } } },
-    (err,doc) =>{
-      if(err){
-        res.json(getJsonFile(false,err.message,null))
-      }else{
-        res.json(getJsonFile(true,'delete success',doc))
+    (err, doc) => {
+      if (err) {
+        res.json(getJsonFile(false, err.message, null));
+      } else {
+        res.json(getJsonFile(true, "delete success", doc));
       }
-
     }
   );
+});
 
-  
+//edit number of item
+router.post("/editItem", (req, res) => {
+  let userId = req.cookies.userId,
+    productId = req.body.productId,
+    productNum = req.body.productNum;
+
+  User.update(
+    { userId: userId, "cartList.productId": productId },
+    //If you don't know the position of edited element, the '$' sign can be used.
+    { "cartList.$.productNum": productNum },
+    (err, doc) => {
+      if (err) {
+        res.json(getJsonFile(false, err.message, null));
+      } else {
+        res.json(getJsonFile(true, "edit success", doc));
+      }
+    }
+  );
 });
 module.exports = router;
