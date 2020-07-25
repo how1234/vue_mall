@@ -137,8 +137,8 @@
                   <div class="item-price-total">{{item.productNum * item.salePrice}}</div>
                 </div>
                 <div class="cart-tab-5">
-                  <div class="cart-item-opration">
-                    <a href="javascript:;" class="item-edit-btn">
+                  <div class="cart-item-opration" >
+                    <a href="javascript:;" class="item-edit-btn" @click="itemDelete(item.productId)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -175,6 +175,13 @@
         </div>
       </div>
     </div>
+    <modal v-on:closeModal="modalClose" :modalShow="modalShowFlag">
+      <p slot="message">Do you want to remove this item?</p>
+      <div slot="btnGroup" >
+        <button class="btn btn--m" @click="itemDeleteConfirm">YES</button>
+        <button class="btn btn--m" @click="modalClose">NO</button>
+      </div>
+    </modal>
     <nav-footer></nav-footer>
   </div>
 </template>
@@ -210,7 +217,9 @@ export default {
   name: "Cart",
   data() {
     return {
-      cartList: []
+      cartList: [],
+      modalShowFlag:false,
+      deletedProductId:''
     };
   },
   mounted() {
@@ -226,6 +235,27 @@ export default {
     },
     getImgUrl(picName) {
       return require("@/../public/static/" + picName);
+    },
+  
+    modalClose(){
+      this.modalShowFlag = false
+    },
+    itemDelete(productId){
+      this.productId = productId
+      this.modalShowFlag = true
+    },
+    itemDeleteConfirm(){
+      this.axios.post('/api/users/delItem',{
+        productId:this.productId
+      }).then( (res)=>{
+        if(res.data.status == 0){
+          this.modalShowFlag = false
+          this.init()
+        }
+      })
+      
+
+      
     }
   }
 };

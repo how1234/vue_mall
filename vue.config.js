@@ -6,7 +6,7 @@ module.exports = {
     //mock server 启动
     // before: require('./mock'),
     proxy: {
-			"/api": {
+			"/api/*": {
 				target: "http://localhost:3000", //设置调用的接口域名和端口
 				changeOrigin: true, //是否跨域
 				ws:true

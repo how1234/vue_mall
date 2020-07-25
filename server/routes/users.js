@@ -57,16 +57,38 @@ router.get("/loginValidation", (req, res) => {
   }
 });
 
+//Get the cart list
 router.get("/cartList", (req, res) => {
   let userId = req.cookies.userId;
   User.findOne({ userId }, (err, doc) => {
     if (err) {
       res.json(getJsonFile(false, err.message, null));
-    } else { 
+    } else {
       if (doc) {
         res.json(getJsonFile(true, "get cart list success", doc.cartList));
       }
     }
   });
+});
+//Delete the item of cart
+router.post("/delItem", (req, res) => {
+  let userId = req.cookies.userId,
+  productId = req.body.productId;
+  
+  //The $pull operator removes from an existing array all instances of a value or values that match a specified condition.
+  User.update(
+    { userId: userId },
+    { $pull: { cartList: { productId: productId } } },
+    (err,doc) =>{
+      if(err){
+        res.json(getJsonFile(false,err.message,null))
+      }else{
+        res.json(getJsonFile(true,'delete success',doc))
+      }
+
+    }
+  );
+
+  
 });
 module.exports = router;
