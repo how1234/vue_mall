@@ -211,7 +211,7 @@ export default {
       this.getGoodsInfo();
     },
     loadMore() {
-      //关闭滚动加载
+      //Close infinite scroll
       this.busy = true;
       setTimeout(() => {
         this.page++;

@@ -151,7 +151,7 @@
                 </div>
                 <div class="cart-tab-4">
                   <div class="item-price-total">
-                    {{ item.productNum * item.salePrice }}
+                    {{ item.productNum * item.salePrice | currency('¥')}}
                   </div>
                 </div>
                 <div class="cart-tab-5">
@@ -190,7 +190,7 @@
             </div>
             <div class="cart-foot-r">
               <div class="item-total">
-                Item total: <span class="total-price">500</span>
+                Item total: <span class="total-price">{{totalPrice | currency('¥')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red">Checkout</a>
@@ -244,25 +244,33 @@ export default {
     return {
       cartList: [],
       modalShowFlag: false,
-      deletedProductId: "",
-    
+      deletedProductId: ""
     };
   },
   computed: {
-    selectAllFlag(){
-      
-      return this.checkedCount === this.cartList.length
+    selectAllFlag() {
+      return this.checkedCount === this.cartList.length;
     },
-    checkedCount(){
-      let temp = 0
+    checkedCount() {
+      let temp = 0;
       this.cartList.forEach(item => {
         if (item.checked) {
-          temp++
+          temp++;
         }
       });
-      return temp
+      return temp;
+    },
+    totalPrice(){
+      let sum = 0;
+      this.cartList.forEach((item) => {
+        if(item.checked){
+          sum += parseFloat(item.salePrice) * parseFloat(item.productNum)
+        }
+        
+      })
+      return sum
     }
- 
+
   },
   mounted() {
     this.init();
@@ -329,7 +337,7 @@ export default {
         .then(res => {
           if (res.data.status == 0) {
             this.cartList.forEach(item => {
-              item.checked = flag
+              item.checked = flag;
             });
           }
         });
