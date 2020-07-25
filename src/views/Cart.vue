@@ -175,8 +175,11 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
-                  <span class="checkbox-btn item-check-btn">
+                <a href="javascipt:;" @click="checkAll()">
+                  <span
+                    class="checkbox-btn item-check-btn"
+                    :class="{ check: selectAllFlag }"
+                  >
                     <svg class="icon icon-ok">
                       <use xlink:href="#icon-ok" />
                     </svg>
@@ -241,19 +244,25 @@ export default {
     return {
       cartList: [],
       modalShowFlag: false,
-      deletedProductId: ""
+      deletedProductId: "",
+      selectAllFlag: true
     };
   },
+  computed: {},
   mounted() {
     this.init();
- 
   },
   methods: {
     init() {
       this.axios.get("/api/users/cartList").then(res => {
         if (res.data.status == 0) {
           this.cartList = res.data.data;
-          console.log(this.cartList)
+
+          this.cartList.forEach(item => {
+            if (!item.checked) {
+              this.selectAllFlag = false;
+            }
+          });
         }
       });
     },
@@ -296,10 +305,24 @@ export default {
           productNum: tempNum,
           checked: checked
         })
-        .then( ()=> {
-
+        .then(() => {
           item.productNum = tempNum;
-          item.checked = checked
+          item.checked = checked;
+        });
+    },
+    checkAll() {
+      this.selectAllFlag = !this.selectAllFlag;
+
+      this.axios
+        .post("/api/users/checkAll", {
+          checkAll: this.selectAllFlag
+        })
+        .then(res => {
+          if (res.data.status == 0) {
+            this.cartList.forEach(item => {
+              item.checked = this.selectAllFlag;
+            });
+          }
         });
     }
   }

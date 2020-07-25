@@ -96,8 +96,6 @@ router.post("/editItem", (req, res) => {
     productNum = req.body.productNum,
     checked = req.body.checked
 
-  console.log(typeof checked)
-  console.log(typeof !!checked)
   User.update(
     { userId: userId, "cartList.productId": productId },
     //If you don't know the position of edited element, the '$' sign can be used.
@@ -112,4 +110,29 @@ router.post("/editItem", (req, res) => {
     }
   );
 });
+
+router.post("/checkAll", (req,res) => {
+  let userId = req.cookies.userId,
+  checkAll = req.body.checkAll
+
+  User.findOne({userId:userId},(err,userDoc) => {
+    if(err){
+      res.json(getJsonFile(false,err.message,null))
+    }else{
+      if(userDoc){
+        userDoc.cartList.forEach( (item) => {
+          item.checked = checkAll
+        })
+
+        userDoc.save((err1,doc) => {
+          if(err1){
+            res.json(getJsonFile(false,err1.message,err1))
+          }else{
+            res.json(getJsonFile(true,'success',doc))
+          }
+        })
+      }
+    }
+  })
+})
 module.exports = router;
