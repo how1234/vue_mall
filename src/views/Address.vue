@@ -101,7 +101,7 @@
                 <li
                   v-for="(addr, index) in limitedAddressList"
                   :key="addr.addressId"
-                  :class="{ 'check': checkedIndex == index }"
+                  :class="{ check: checkedIndex == index }"
                   @click="checkedIndex = index"
                 >
                   <dl>
@@ -110,7 +110,7 @@
                     <dd class="tel">{{ addr.tel }}</dd>
                   </dl>
                   <div class="addr-opration addr-del">
-                    <a href="javascript:;" class="addr-del-btn">
+                    <a class="addr-del-btn" @click="modalShow(addr.addressId)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -187,6 +187,15 @@
         </div>
       </div>
     </div>
+    <modal :modalShow="removeMdShowFlag" v-on:closeModal="modalClose">
+      <p slot="message">
+        Do you want to remove this address
+      </p>
+      <div slot="btnGroup">
+        <button class="btn btn--m" @click="deleteAddress">Yes</button>
+        <button class="btn btn--m" @click="modalClose">No</button>
+      </div>
+    </modal>
     <nav-footer></nav-footer>
   </div>
 </template>
@@ -198,7 +207,9 @@ export default {
     return {
       limitNumber: 3,
       checkedIndex: 0,
-      addressList: []
+      addressList: [],
+      removeMdShowFlag: false,
+      removedAressId: ""
     };
   },
   mounted() {
@@ -247,16 +258,15 @@ export default {
         })
         .then(res => {
           if (res.data.status == 0) {
-           
-            let tempAddressList = [...this.addressList]
+            let tempAddressList = [...this.addressList];
             let swappedItemIndex = 0;
             //let default address always appear in the first place
             tempAddressList.forEach((item, index) => {
               if (item.addressId === addressId) {
-                item.isDefault = true
+                item.isDefault = true;
                 swappedItemIndex = index;
-              }else{
-                item.isDefault = false
+              } else {
+                item.isDefault = false;
               }
             });
 
@@ -269,6 +279,28 @@ export default {
             this.addressList = tempAddressList;
           }
         });
+    },
+    modalClose() {
+      this.addressid = "";
+      this.removeMdShowFlag = false;
+    },
+    modalShow(addressId) {
+      this.addressId = addressId;
+      this.removeMdShowFlag = true;
+    },
+    deleteAddress() {
+      if (this.addressId) {
+        this.axios
+          .post("/api/users/deleteAddress", {
+            addressId: this.addressId
+          })
+          .then(res => {
+            if (res.data.status == 0) {
+              this.init()
+              this.removeMdShowFlag = false
+            }
+          });
+      }
     }
   }
 };

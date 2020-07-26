@@ -137,46 +137,73 @@ router.post("/checkAll", (req, res) => {
 });
 
 //Get the address list of user
-router.get("/addressList",(req,res)=>{
-  let userId = req.cookies.userId; 
-  User.findOne({userId:userId},(err,doc) => {
-    if(err){
-      res.json(getJsonFile(false,err.message,err))
-    }else{
-      res.json(getJsonFile(true,'Get address success',doc))
+router.get("/addressList", (req, res) => {
+  let userId = req.cookies.userId;
+  User.findOne({ userId: userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, err));
+    } else {
+      res.json(getJsonFile(true, "Get address success", doc));
     }
-  })
-})
+  });
+});
+//set the default address
+router.post("/setDefaultAddress", (req, res) => {
+  let userId = req.cookies.userId,
+    addressId = req.body.addressId;
 
-router.post("/setDefaultAddress",(req,res)=>{
-  let userId = req.cookies.userId,addressId = req.body.addressId
-   
-  if(!addressId){
-    res.json(getJsonFile(false,"address is not existed",null))
+  if (!addressId) {
+    res.json(getJsonFile(false, "address is not existed", null));
   }
-  User.findOne({userId:userId},(err,doc) => {
-    if(err){
-      res.json(getJsonFile(false,err.message,err))
-    }else{
-      console.log(doc)
-      let addressList = doc.addressList
-      
-      addressList.forEach( (item) => {
-        if(item.addressId === addressId){
-          item.isDefault = true
-        }else{
-          item.isDefault = false
-        }
-      })
+  User.findOne({ userId: userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, err));
+    } else {
+      console.log(doc);
+      let addressList = doc.addressList;
 
-      doc.save((err1) => {
-        if(err1){
-          res.json(getJsonFile(false,err1.message,null))
-        }else{
-          res.json(getJsonFile(true,"set success",null))
+      addressList.forEach(item => {
+        if (item.addressId === addressId) {
+          item.isDefault = true;
+        } else {
+          item.isDefault = false;
         }
-      })
+      });
+
+      doc.save(err1 => {
+        if (err1) {
+          res.json(getJsonFile(false, err1.message, null));
+        } else {
+          res.json(getJsonFile(true, "set success", null));
+        }
+      });
     }
-  })
-})
+  });
+});
+
+//Delete address
+router.post("/deleteAddress", (req, res) => {
+  let userId = req.cookies.userId,
+    addressId = req.body.addressId;
+  console.log(addressId)
+  User.update(
+    {
+      userId: userId
+    },
+    {
+      $pull: {
+        "addressList": {
+          "addressId":addressId
+        }
+      }
+    },
+    (err,doc) =>{
+      if(err){
+        res.json(getJsonFile(false,err.message,null))
+      }else{
+        res.json(getJsonFile(true,'delete success',doc))
+      }
+    }
+  );
+});
 module.exports = router;
