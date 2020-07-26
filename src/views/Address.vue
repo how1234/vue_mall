@@ -1,6 +1,5 @@
 <template>
   <div>
-   
     <nav-header></nav-header>
     <nav-breadcrumb>
       <span>Address</span>
@@ -99,11 +98,16 @@
           <div class="addr-list-wrap">
             <div class="addr-list">
               <ul>
-                <li v-for="addr in addressList" :key="addr.addressId">
+                <li
+                  v-for="(addr, index) in limitedAddressList"
+                  :key="addr.addressId"
+                  :class="{ check: checkedIndex == index }"
+                  @click="checkedIndex = index"
+                >
                   <dl>
-                    <dt>{{addr.recipient}}</dt>
-                    <dd class="address">{{addr.street}}</dd>
-                    <dd class="tel">{{addr.tel}}</dd>
+                    <dt>{{ addr.recipient }}</dt>
+                    <dd class="address">{{ addr.street }}</dd>
+                    <dd class="tel">{{ addr.tel }}</dd>
                   </dl>
                   <div class="addr-opration addr-del">
                     <a href="javascript:;" class="addr-del-btn">
@@ -113,11 +117,20 @@
                     </a>
                   </div>
                   <div class="addr-opration addr-set-default">
-                    <a href="javascript:;" class="addr-set-default-btn"
+                    <a
+                      href="javascript:;"
+                      class="addr-set-default-btn"
+                      v-show="!addr.isDefault"
+                      @click="setDefaultAddress(addr.addressId)"
                       ><i>Set default</i></a
                     >
                   </div>
-                  <div class="addr-opration addr-default">Default address</div>
+                  <div
+                    class="addr-opration addr-default"
+                    v-show="addr.isDefault"
+                  >
+                    Default address
+                  </div>
                 </li>
                 <li class="addr-new">
                   <div class="add-new-inner">
@@ -133,7 +146,12 @@
             </div>
 
             <div class="shipping-addr-more">
-              <a class="addr-more-btn up-down-btn" href="javascript:;">
+              <a
+                class="addr-more-btn up-down-btn"
+                href="javascript:;"
+                @click="expandList"
+                :class="{ open: limitNumber >= addressList.length }"
+              >
                 more
                 <i class="i-up-down">
                   <i class="i-up-down-l"></i>
@@ -178,18 +196,51 @@ export default {
   name: "Address",
   data() {
     return {
-      addressList:[]
+      limitNumber: 3,
+      checkedIndex: 0,
+      addressList: []
     };
   },
-  mounted(){
-    this.init()
+  mounted() {
+    this.init();
   },
-  methods:{
-    init(){
-      this.axios.get('/api/users/addressList').then( (res) => {
-        if(res.data.status == 0){
-          this.addressList = res.data.data.addressList
+  computed: {
+    limitedAddressList() {
+      return this.addressList.slice(0, this.limitNumber);
+    }
+  },
+  methods: {
+    init() {
+      this.axios.get("/api/users/addressList").then(res => {
+        if (res.data.status == 0) {
+          this.addressList = res.data.data.addressList;
+          this.addressList.forEach( (item,index) => {
+            if(item.isDefault){
+              this.checkedIndex = index
+            }
+          })
         }
+      });
+    },
+    expandList() {
+      this.limitNumber *= 2;
+      console.log(this.limitNumber);
+    },
+    setDefaultAddress(addressId){
+      this.axios.post("/api/users/setDefaultAddress",{
+        addressId:addressId
+      }).then( (res) => {
+        if(res.data.status == 0){
+          this.addressList.forEach( (item,index) => {
+            if(item.addressId !==addressId){
+              item.isDefault = false
+            }else{
+              item.isDefault = true
+              this.checkedIndex = index
+            }
+          })
+        }
+        
       })
     }
   }

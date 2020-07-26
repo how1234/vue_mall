@@ -147,4 +147,36 @@ router.get("/addressList",(req,res)=>{
     }
   })
 })
+
+router.post("/setDefaultAddress",(req,res)=>{
+  let userId = req.cookies.userId,addressId = req.body.addressId
+   
+  if(!addressId){
+    res.json(getJsonFile(false,"address is not existed",null))
+  }
+  User.findOne({userId:userId},(err,doc) => {
+    if(err){
+      res.json(getJsonFile(false,err.message,err))
+    }else{
+      console.log(doc)
+      let addressList = doc.addressList
+      
+      addressList.forEach( (item) => {
+        if(item.addressId === addressId){
+          item.isDefault = true
+        }else{
+          item.isDefault = false
+        }
+      })
+
+      doc.save((err1) => {
+        if(err1){
+          res.json(getJsonFile(false,err1.message,null))
+        }else{
+          res.json(getJsonFile(true,"set success",null))
+        }
+      })
+    }
+  })
+})
 module.exports = router;
