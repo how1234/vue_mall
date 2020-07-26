@@ -1,7 +1,9 @@
 <template>
   <div>
     <nav-header></nav-header>
-    <nav-breadcrumb></nav-breadcrumb>
+    <nav-breadcrumb>
+      <span>Cart</span>
+    </nav-breadcrumb>
     <header class="header">
       <symbol id="icon-cart" viewBox="0 0 38 32">
         <title>cart</title>
@@ -193,7 +195,7 @@
                 Item total: <span class="total-price">{{totalPrice | currency('¥')}}</span>
               </div>
               <div class="btn-wrap">
-                <a class="btn btn--red">Checkout</a>
+                <a class="btn btn--red" :class="{'btn--dis':checkedCount === 0}" @click="checkout()" >Checkout</a>
               </div>
             </div>
           </div>
@@ -341,6 +343,13 @@ export default {
             });
           }
         });
+    },
+    checkout(){
+      if(this.checkedCount > 0){
+        this.$router.push({
+          path:"/address"
+        })
+      }
     }
   }
 };

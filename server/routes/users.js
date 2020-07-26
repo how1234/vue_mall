@@ -94,7 +94,7 @@ router.post("/editItem", (req, res) => {
   let userId = req.cookies.userId,
     productId = req.body.productId,
     productNum = req.body.productNum,
-    checked = req.body.checked
+    checked = req.body.checked;
 
   User.update(
     { userId: userId, "cartList.productId": productId },
@@ -111,27 +111,39 @@ router.post("/editItem", (req, res) => {
   );
 });
 
-router.post("/checkAll", (req,res) => {
+router.post("/checkAll", (req, res) => {
   let userId = req.cookies.userId,
-  checkAll = req.body.checkAll
+    checkAll = req.body.checkAll;
 
-  User.findOne({userId:userId},(err,userDoc) => {
-    if(err){
-      res.json(getJsonFile(false,err.message,null))
-    }else{
-      if(userDoc){
-        userDoc.cartList.forEach( (item) => {
-          item.checked = checkAll
-        })
+  User.findOne({ userId: userId }, (err, userDoc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, null));
+    } else {
+      if (userDoc) {
+        userDoc.cartList.forEach(item => {
+          item.checked = checkAll;
+        });
 
-        userDoc.save((err1,doc) => {
-          if(err1){
-            res.json(getJsonFile(false,err1.message,err1))
-          }else{
-            res.json(getJsonFile(true,'success',doc))
+        userDoc.save((err1, doc) => {
+          if (err1) {
+            res.json(getJsonFile(false, err1.message, err1));
+          } else {
+            res.json(getJsonFile(true, "success", doc));
           }
-        })
+        });
       }
+    }
+  });
+});
+
+//Get the address list of user
+router.get("/addressList",(req,res)=>{
+  let userId = req.cookies.userId; 
+  User.findOne({userId:userId},(err,doc) => {
+    if(err){
+      res.json(getJsonFile(false,err.message,err))
+    }else{
+      res.json(getJsonFile(true,'Get address success',doc))
     }
   })
 })

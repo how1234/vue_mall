@@ -15,7 +15,16 @@ var userSchema = new mongoose.Schema({
       "productNum":String
     }
   ],
-  "addressList":Array
+  "addressList":[
+    {
+      "addressId":String,
+      "recipient":String,
+      "street":String,
+      "postCode":String,
+      "tel":String,
+      "isDefault":Boolean
+    }
+  ]
 })
 
 
