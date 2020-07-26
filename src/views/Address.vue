@@ -101,7 +101,7 @@
                 <li
                   v-for="(addr, index) in limitedAddressList"
                   :key="addr.addressId"
-                  :class="{ check: checkedIndex == index }"
+                  :class="{ 'check': checkedIndex == index }"
                   @click="checkedIndex = index"
                 >
                   <dl>
@@ -213,35 +213,62 @@ export default {
     init() {
       this.axios.get("/api/users/addressList").then(res => {
         if (res.data.status == 0) {
-          this.addressList = res.data.data.addressList;
-          this.addressList.forEach( (item,index) => {
-            if(item.isDefault){
-              this.checkedIndex = index
+          let tempAddressList = res.data.data.addressList;
+
+          let swappedItemIndex = 0;
+          //let default address always appear in the first place
+          tempAddressList.forEach((item, index) => {
+            if (item.isDefault) {
+              swappedItemIndex = index;
             }
-          })
+          });
+
+          let temp = tempAddressList[0];
+          let defaultItem = tempAddressList[swappedItemIndex];
+
+          tempAddressList[0] = defaultItem;
+          tempAddressList[swappedItemIndex] = temp;
+
+          this.addressList = tempAddressList;
         }
       });
     },
     expandList() {
-      this.limitNumber *= 2;
-      console.log(this.limitNumber);
+      if (this.limitNumber < this.addressList.length) {
+        this.limitNumber *= 2;
+      } else {
+        this.limitNumber = 3;
+      }
     },
-    setDefaultAddress(addressId){
-      this.axios.post("/api/users/setDefaultAddress",{
-        addressId:addressId
-      }).then( (res) => {
-        if(res.data.status == 0){
-          this.addressList.forEach( (item,index) => {
-            if(item.addressId !==addressId){
-              item.isDefault = false
-            }else{
-              item.isDefault = true
-              this.checkedIndex = index
-            }
-          })
-        }
-        
-      })
+    setDefaultAddress(addressId) {
+      this.axios
+        .post("/api/users/setDefaultAddress", {
+          addressId: addressId
+        })
+        .then(res => {
+          if (res.data.status == 0) {
+           
+            let tempAddressList = [...this.addressList]
+            let swappedItemIndex = 0;
+            //let default address always appear in the first place
+            tempAddressList.forEach((item, index) => {
+              if (item.addressId === addressId) {
+                item.isDefault = true
+                swappedItemIndex = index;
+              }else{
+                item.isDefault = false
+              }
+            });
+
+            let temp = tempAddressList[0];
+            let defaultItem = tempAddressList[swappedItemIndex];
+
+            tempAddressList[0] = defaultItem;
+            tempAddressList[swappedItemIndex] = temp;
+
+            this.addressList = tempAddressList;
+          }
+        });
     }
   }
 };
