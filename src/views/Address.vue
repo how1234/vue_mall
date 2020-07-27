@@ -102,7 +102,7 @@
                   v-for="(addr, index) in limitedAddressList"
                   :key="addr.addressId"
                   :class="{ check: checkedIndex == index }"
-                  @click="checkedIndex = index"
+                  @click="checkedIndex = index;checkedAddressId = addr.addressId"
                 >
                   <dl>
                     <dt>{{ addr.recipient }}</dt>
@@ -182,7 +182,9 @@
             </div>
           </div>
           <div class="next-btn-wrap">
-            <a class="btn btn--m btn--red" href="#">Next</a>
+            <router-link class="btn btn--m btn--red" :to="{path:'/orderConfirm',query:{'addressId':this.checkedAddressId}}"
+              >Next</router-link
+            >
           </div>
         </div>
       </div>
@@ -207,6 +209,7 @@ export default {
     return {
       limitNumber: 3,
       checkedIndex: 0,
+      checkedAddressId:'',
       addressList: [],
       removeMdShowFlag: false,
       removedAressId: ""
@@ -241,6 +244,9 @@ export default {
           tempAddressList[swappedItemIndex] = temp;
 
           this.addressList = tempAddressList;
+          if(this.addressList[0]){
+            this.checkedAddressId = this.addressList[0].addressId
+          }
         }
       });
     },
@@ -296,8 +302,8 @@ export default {
           })
           .then(res => {
             if (res.data.status == 0) {
-              this.init()
-              this.removeMdShowFlag = false
+              this.init();
+              this.removeMdShowFlag = false;
             }
           });
       }

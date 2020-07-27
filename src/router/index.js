@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Cart from '../views/Cart.vue'
 import Address from '../views/Address.vue'
+import OrderConfirmation from '../views/OrderConfirmation.vue'
 Vue.use(VueRouter)
 
   const routes = [
@@ -20,6 +21,11 @@ Vue.use(VueRouter)
     path:'/address',
     name:'Address',
     component:Address
+  },
+  {
+    path:'/orderConfirmation',
+    name:'OrderConfirmation',
+    component:OrderConfirmation
   }
 ]
 
