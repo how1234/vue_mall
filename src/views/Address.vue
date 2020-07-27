@@ -182,7 +182,7 @@
             </div>
           </div>
           <div class="next-btn-wrap">
-            <router-link class="btn btn--m btn--red" :to="{path:'/orderConfirm',query:{'addressId':this.checkedAddressId}}"
+            <router-link class="btn btn--m btn--red" :to="{path:'/OrderInitialize',query:{'addressId':this.checkedAddressId}}"
               >Next</router-link
             >
           </div>

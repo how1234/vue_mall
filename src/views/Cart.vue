@@ -347,7 +347,7 @@ export default {
     checkout(){
       if(this.checkedCount > 0){
         this.$router.push({
-          path:"/OrderConfirmation"
+          path:"/address"
         })
       }
     }
