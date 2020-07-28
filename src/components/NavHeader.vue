@@ -22,18 +22,33 @@
       </symbol>
       <div class="navbar">
         <div class="navbar-left-container">
-          <a href="/">
-            logo</a>
+          <a href="/"> logo</a>
         </div>
         <div class="navbar-right-container" style="display: flex;">
           <div class="navbar-menu-container">
-            <a href="javascript:void(0)"  class="navbar-link" v-text="nickName" v-if="nickName"></a>
-  
-            
-            <a href="javascript:void(0)" class="navbar-link" @click="loginPopUp" v-show="!nickName">Login</a>
-            <a href="javascript:void(0)" class="navbar-link" @click="logout" v-show="nickName">Logout</a>
+            <a
+              href="javascript:void(0)"
+              class="navbar-link"
+              v-text="userName"
+              v-if="userName"
+            ></a>
+
+            <a
+              href="javascript:void(0)"
+              class="navbar-link"
+              @click="loginPopUp"
+              v-show="!userName"
+              >Login</a
+            >
+            <a
+              href="javascript:void(0)"
+              class="navbar-link"
+              @click="logout"
+              v-show="userName"
+              >Logout</a
+            >
             <div class="navbar-cart-container">
-              <span class="navbar-cart-count"></span>
+              <span class="navbar-cart-count">{{cartCount}}</span>
               <a class="navbar-link navbar-cart-link" href="/cart">
                 <svg class="navbar-cart-logo">
                   <use
@@ -46,34 +61,55 @@
           </div>
         </div>
       </div>
-      <div class="md-modal modal-msg md-modal-transition" v-show="loginModalShowFlag">
-          <div class="md-modal-inner">
-            <div class="md-top">
-              <div class="md-title">Login in</div>
-              <button class="md-close" @click="loginClose">Close</button>
+      <div
+        class="md-modal modal-msg md-modal-transition"
+        v-show="loginModalShowFlag"
+      >
+        <div class="md-modal-inner">
+          <div class="md-top">
+            <div class="md-title">Login in</div>
+            <button class="md-close" @click="loginClose">Close</button>
+          </div>
+          <div class="md-content">
+            <div class="confirm-tips">
+              <div class="error-wrap">
+                <span class="error error-show" v-show="errorShow"
+                  >Invalid user name or password</span
+                >
+              </div>
+              <ul>
+                <li class="regi_form_input">
+                  <i class="icon IconPeople"></i>
+                  <input
+                    type="text"
+                    tabindex="1"
+                    v-model="inputUserName"
+                    name="loginname"
+                    class="regi_login_input regi_login_input_left"
+                    placeholder="User Name"
+                    data-type="loginname"
+                  />
+                </li>
+                <li class="regi_form_input noMargin">
+                  <i class="icon IconPwd"></i>
+                  <input
+                    type="password"
+                    tabindex="2"
+                    v-model="inputUserPassword"
+                    name="password"
+                    class="regi_login_input regi_login_input_left login-input-no input_text"
+                    placeholder="Password"
+                    @keyup.enter="login"
+                  />
+                </li>
+              </ul>
             </div>
-            <div class="md-content">
-              <div class="confirm-tips">
-                <div class="error-wrap">
-                  <span class="error error-show" v-show="errorShow">Invalid user name or password</span>
-                </div>
-                <ul>
-                  <li class="regi_form_input">
-                    <i class="icon IconPeople"></i>
-                    <input type="text" tabindex="1" v-model="userName" name="loginname" class="regi_login_input regi_login_input_left" placeholder="User Name" data-type="loginname">
-                  </li>
-                  <li class="regi_form_input noMargin">
-                    <i class="icon IconPwd"></i>
-                    <input type="password" tabindex="2" v-model="userPwd" name="password"  class="regi_login_input regi_login_input_left login-input-no input_text" placeholder="Password" @keyup.enter="login" >
-                  </li>
-                </ul>
-              </div>
-              <div class="login-wrap">
-                <a href="javascript:;" class="btn-login" @click="login" >Login </a>
-              </div>
+            <div class="login-wrap">
+              <a href="javascript:;" class="btn-login" @click="login">Login </a>
             </div>
           </div>
         </div>
+      </div>
       <div class="md-overlay" v-show="loginModalShowFlag"></div>
     </header>
   </div>
@@ -82,72 +118,79 @@
 tr:last-child td {
   padding-bottom: 0;
 }
-
 </style>
 
 <script>
-import '../assets/css/base.css'
-import '../assets/css/product.css'
-import '../assets/css/login.css'
-
-
+import "../assets/css/base.css";
+import "../assets/css/product.css";
+import "../assets/css/login.css";
 
 export default {
   name: "NavHeader",
   data() {
     return {
-      nickName:"",
-      userName:"",
-      userPwd:"",
-      errorShow:false,
-      loginModalShowFlag:false,
+      inputUserName: "",
+      inputUserPassword: "",
+      errorShow: false,
+      loginModalShowFlag: false,
       styleObject: {
         backgroundColor: "grey"
       }
     };
   },
-  mounted(){
-    this.checkedLogin()
+  mounted() {
+    this.$store.dispatch('initializeCartCount')
+    this.checkedLogin();
   },
-  methods:{
-    checkedLogin(){
-      this.axios.get('/api/users/loginValidation').then((res)=>{
-        if(res.data.status == 0){
-          this.nickName = res.data.data
-        }
-  
-      })
+  computed: {
+    userName(){
+      return this.$store.state.userName
     },
-    login(){
-      if(!this.userName || !this.userPwd){
-        this.errorShow = true
-        return 
+    cartCount(){
+      return this.$store.state.cartCount
+    }
+  },
+  methods: {
+    checkedLogin() {
+      this.axios.get("/api/users/loginValidation").then(res => {
+        if (res.data.status == 0) {
+          
+          this.$store.commit('login',res.data.data)
+        }
+      });
+    },
+    login() {
+      if (!this.inputUserName || !this.inputUserPassword) {
+        this.errorShow = true;
+        return;
       }
-      this.axios.post("/api/users/login",{
-        userName:this.userName,
-        userPwd:this.userPwd
-      }).then( (res) => {
-        
-        if(res.data.status == 1){
-          this.errorShow = true
-        }else{
-          this.nickName = res.data.data.userName
-          this.errorShow = false
-          this.loginModalShowFlag = false
-        }
-      })
+      this.axios
+        .post("/api/users/login", {
+          userName: this.inputUserName,
+          userPwd: this.inputUserPassword
+        })
+        .then( (res) => {
+          if (res.data.status == 1) {
+            this.errorShow = true;
+          } else {
+            
+            this.$store.commit("login", res.data.data.userName);
+
+            this.errorShow = false;
+            this.loginModalShowFlag = false;
+          }
+        });
     },
-    logout(){
-      this.axios.post("/api/users/logout",{}).then( (res) => {
-        console.log(res)
-        this.nickName=''
-      })
+    logout() {
+      this.axios.post("/api/users/logout", {}).then(() => {
+        this.$store.commit("logout");
+      });
     },
-    loginPopUp(){
-      this.loginModalShowFlag = true
+    loginPopUp() {
+      this.loginModalShowFlag = true;
     },
-    loginClose(){
-      this.loginModalShowFlag = false
+    loginClose() {
+      this.loginModalShowFlag = false;
     }
   }
 };

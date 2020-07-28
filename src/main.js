@@ -4,10 +4,12 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 
+
 import GlobalComponents from './components/globalComponents'
 import VueLazyload from 'vue-lazyload'
 import infiniteScroll from 'vue-infinite-scroll'
 import {currency} from './utils/currency'
+
 
 Vue.config.productionTip = false
 Vue.prototype.axios = axios

@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { getJsonFile,generateOrderInfo } = require("../utils/");
+const { getJsonFile, generateOrderInfo } = require("../utils/");
 var User = require("./../models/users");
 
 /* GET users listing. */
@@ -95,12 +95,11 @@ router.post("/editItem", (req, res) => {
     productId = req.body.productId,
     productNum = req.body.productNum,
     checked = req.body.checked;
-
+  console.log(productNum);
   User.update(
     { userId: userId, "cartList.productId": productId },
     //If you don't know the position of edited element, the '$' sign can be used.
-    { "cartList.$.checked": !!checked },
-    { "cartList.$.productNum": productNum },
+    { "cartList.$.checked": !!checked, "cartList.$.productNum": productNum },
     (err, doc) => {
       if (err) {
         res.json(getJsonFile(false, err.message, null));
@@ -185,117 +184,139 @@ router.post("/setDefaultAddress", (req, res) => {
 router.post("/deleteAddress", (req, res) => {
   let userId = req.cookies.userId,
     addressId = req.body.addressId;
-  console.log(addressId)
+  console.log(addressId);
   User.update(
     {
       userId: userId
     },
     {
       $pull: {
-        "addressList": {
-          "addressId":addressId
+        addressList: {
+          addressId: addressId
         }
       }
     },
-    (err,doc) =>{
-      if(err){
-        res.json(getJsonFile(false,err.message,null))
-      }else{
-        res.json(getJsonFile(true,'delete success',doc))
+    (err, doc) => {
+      if (err) {
+        res.json(getJsonFile(false, err.message, null));
+      } else {
+        res.json(getJsonFile(true, "delete success", doc));
       }
     }
   );
 });
 
 //Make payment
-router.post("/makePayment",(req,res)=>{
-  let userId = req.cookies.userId,paymentAmount = req.body.paymentAmount,
-  addressId = req.body.addressId 
+router.post("/makePayment", (req, res) => {
+  let userId = req.cookies.userId,
+    paymentAmount = req.body.paymentAmount,
+    addressId = req.body.addressId;
   //get user address
-  User.findOne({userId:userId},(err,doc) => {
-    if(err){
-      res.json(getJsonFile(err,err.message,null))
-    }else{
-      let curAddress = ''
-      let goodsList = []
-      doc.addressList.forEach( (item) => {
-        if(item.addressId === addressId){
-          curAddress = item
+  User.findOne({ userId: userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(err, err.message, null));
+    } else {
+      let curAddress = "";
+      let goodsList = [];
+      doc.addressList.forEach(item => {
+        if (item.addressId === addressId) {
+          curAddress = item;
         }
-      })
+      });
 
-      let tempCartList = []
-      //get cart list 
-      doc.cartList.filter( (item) => {
-        if(item.checked){
-          goodsList.push(item)
-        }else{
-          tempCartList.push(item)
+      let tempCartList = [];
+      //get cart list
+      doc.cartList.filter(item => {
+        if (item.checked) {
+          goodsList.push(item);
+        } else {
+          tempCartList.push(item);
         }
-      })
+      });
 
-      let {orderId,date} = generateOrderInfo()
+      let { orderId, date } = generateOrderInfo();
 
       //create order
       let order = {
-        orderId:orderId,
-        paymentAmount:paymentAmount,
-        address:curAddress,
-        goodsList:goodsList,
-        orderStatus:'unpaid',
-        date:date
-      }
+        orderId: orderId,
+        paymentAmount: paymentAmount,
+        address: curAddress,
+        goodsList: goodsList,
+        orderStatus: "unpaid",
+        date: date
+      };
       //update cartlist
-      doc.cartList = tempCartList
-      doc.orderList.push(order)
+      doc.cartList = tempCartList;
+      doc.orderList.push(order);
 
-      doc.save( (err1)=>{
-        if(err1){
-          res.json(getJsonFile(false,err1.message,null))
-        }else{
-          
-          res.json(getJsonFile(true,'Order is created!',{
-            orderId:order.orderId,
-            paymentAmount:order.paymentAmount
-          }))
+      doc.save(err1 => {
+        if (err1) {
+          res.json(getJsonFile(false, err1.message, null));
+        } else {
+          res.json(
+            getJsonFile(true, "Order is created!", {
+              orderId: order.orderId,
+              paymentAmount: order.paymentAmount
+            })
+          );
         }
-      })
+      });
     }
-  })
+  });
 });
 
 //get order information
 
-router.get("/orderInfo",(req,res)=>{
-  let userId = req.cookies.userId,orderId = req.param("orderId")
-  User.findOne({userId:userId},(err,doc) => {
-    if(err){
-      res.json(getJsonFile(false,err.message,null))
-    }else{
-      let orderList = doc.orderList
-      if(orderList.length > 0){
+router.get("/orderInfo", (req, res) => {
+  let userId = req.cookies.userId,
+    orderId = req.param("orderId");
+  User.findOne({ userId: userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, null));
+    } else {
+      let orderList = doc.orderList;
+      if (orderList.length > 0) {
         let order;
-        orderList.forEach( (item) => {
-          if(item.orderId === orderId){
-            order = item
+        orderList.forEach(item => {
+          if (item.orderId === orderId) {
+            order = item;
           }
-        })
+        });
 
-        if(order){
-          res.json(getJsonFile(true,'Get order Success',{
-            orderId:order.orderId,
-            paymentAmount:order.paymentAmount
-          }))
-        }else{
-          res.json(getJsonFile(false,'No order',null))
+        if (order) {
+          res.json(
+            getJsonFile(true, "Get order Success", {
+              orderId: order.orderId,
+              paymentAmount: order.paymentAmount
+            })
+          );
+        } else {
+          res.json(getJsonFile(false, "No order", null));
         }
-
-      }else{
-        res.json(getJsonFile(false,'No orders',null))
+      } else {
+        res.json(getJsonFile(false, "No orders", null));
       }
     }
-  })
-})
+  });
+});
 
+//get counts of cart
+
+router.get("/getCartCount", (req, res) => {
+  let userId = req.cookies.userId;
+
+  User.findOne({ userId: userId }, (err, doc) => {
+    if (err) {
+      res.json(getJsonFile(false, err.message, null));
+    } else {
+      let counts = 0;
+      doc.cartList.forEach(item => {
+        counts += parseInt(item.productNum);
+      });
+
+      res.json(getJsonFile(true, "Get counts of cart success", counts));
+    }
+  });
+});
 
 module.exports = router;

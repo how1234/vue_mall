@@ -313,6 +313,7 @@ export default {
     },
     editItemNum(item, num, checked) {
       let tempNum = parseInt(item.productNum) + num;
+      //validate the num
       if (tempNum < 1) {
         tempNum = 1;
         return;
@@ -324,9 +325,14 @@ export default {
           productNum: tempNum,
           checked: checked
         })
-        .then(() => {
-          item.productNum = tempNum;
-          item.checked = checked;
+        .then((res) => {
+          console.log(res)
+          if(res.data.status == 0){
+            this.$store.commit('updateCartCount',tempNum - item.productNum)
+            item.productNum = tempNum;
+            item.checked = checked;
+          }
+          
         });
     },
     checkAll() {
