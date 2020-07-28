@@ -146,7 +146,7 @@
             <router-link class="btn btn--m" to='/address'>Previous</router-link>
           </div>
           <div class="next-btn-wrap">
-            <button class="btn btn--m btn--red">Proceed to payment</button>
+            <button class="btn btn--m btn--red" @click="makePayment">Proceed to payment</button>
           </div>
         </div>
       </div>
@@ -195,9 +195,24 @@ export default {
         }
       });
     },
+    makePayment(){
+      let addressId = this.$route.query.addressId
+      console.log(addressId)
+      this.axios.post('/api/users/makePayment',{
+        addressId:addressId,
+        paymentAmount:this.totalPrice
+      }).then( (res) => {
+        console.log(res)
+        if(res.data.status == 0){
+          let data = res.data.data
+          this.$router.push('/orderSuccess?orderId='+data.orderId)
+        }
+      })
+    },
     getImgUrl(picName) {
       return require("@/../public/static/" + picName);
-    }
+    },
+    
   }
 };
 </script>

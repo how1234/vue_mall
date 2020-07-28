@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { getJsonFile } = require("../utils/");
+const { getJsonFile,generateOrderInfo } = require("../utils/");
 var User = require("./../models/users");
 
 /* GET users listing. */
@@ -206,4 +206,62 @@ router.post("/deleteAddress", (req, res) => {
     }
   );
 });
+
+//Make payment
+router.post("/makePayment",(req,res)=>{
+  let userId = req.cookies.userId,paymentAmount = req.body.paymentAmount,
+  addressId = req.body.addressId 
+  //get user address
+  User.findOne({userId:userId},(err,doc) => {
+    if(err){
+      res.json(getJsonFile(err,err.message,null))
+    }else{
+      let curAddress = ''
+      let goodsList = []
+      doc.addressList.forEach( (item) => {
+        if(item.addressId === addressId){
+          curAddress = item
+        }
+      })
+
+      let tempCartList = []
+      //get cart list 
+      doc.cartList.filter( (item) => {
+        if(item.checked){
+          goodsList.push(item)
+        }else{
+          tempCartList.push(item)
+        }
+      })
+
+      let {orderId,date} = generateOrderInfo()
+
+      //create order
+      let order = {
+        orderId:orderId,
+        paymentAmount:paymentAmount,
+        address:curAddress,
+        goodsList:goodsList,
+        orderStatus:'unpaid',
+        date:date
+      }
+      //update cartlist
+      doc.cartList = tempCartList
+      doc.orderList.push(order)
+
+      doc.save( (err1)=>{
+        if(err1){
+          res.json(getJsonFile(false,err1.message,null))
+        }else{
+          
+          res.json(getJsonFile(true,'Order is created!',{
+            orderId:order.orderId,
+            paymentAmount:order.paymentAmount
+          }))
+        }
+      })
+    }
+  })
+
+})
 module.exports = router;
