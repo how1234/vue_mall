@@ -307,6 +307,12 @@ export default {
             this.cartList = this.cartList.filter(
               item => item.productId !== this.productId
             );
+            let counts = 0
+            this.cartList.forEach( (item) => {
+              counts += item.productNum
+            } )
+            this.$store.commit('setCartCount',counts)
+
             this.productId = "";
           }
         });
