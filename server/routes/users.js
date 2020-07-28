@@ -262,6 +262,40 @@ router.post("/makePayment",(req,res)=>{
       })
     }
   })
+});
 
+//get order information
+
+router.get("/orderInfo",(req,res)=>{
+  let userId = req.cookies.userId,orderId = req.param("orderId")
+  User.findOne({userId:userId},(err,doc) => {
+    if(err){
+      res.json(getJsonFile(false,err.message,null))
+    }else{
+      let orderList = doc.orderList
+      if(orderList.length > 0){
+        let order;
+        orderList.forEach( (item) => {
+          if(item.orderId === orderId){
+            order = item
+          }
+        })
+
+        if(order){
+          res.json(getJsonFile(true,'Get order Success',{
+            orderId:order.orderId,
+            paymentAmount:order.paymentAmount
+          }))
+        }else{
+          res.json(getJsonFile(false,'No order',null))
+        }
+
+      }else{
+        res.json(getJsonFile(false,'No orders',null))
+      }
+    }
+  })
 })
+
+
 module.exports = router;

@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Cart from '../views/Cart.vue'
 import Address from '../views/Address.vue'
 import OrderInitialize from '../views/OrderInitialize'
+import OrderSuccess from '../views/OrderSuccess'
 Vue.use(VueRouter)
 
   const routes = [
@@ -26,6 +27,11 @@ Vue.use(VueRouter)
     path:'/OrderInitialize',
     name:'OrderInitialize',
     component:OrderInitialize
+  },
+  {
+    path:'/OrderSuccess',
+    name:'OrderSuccess',
+    component:OrderSuccess
   }
 ]
 
