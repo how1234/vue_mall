@@ -9,10 +9,13 @@ router.get("/", function(req, res) {
 });
 
 router.post("/login", function(req, res) {
+ 
   var param = {
     userName: req.body.userName,
     userPwd: req.body.userPwd
   };
+
+
   User.findOne(param, (err, doc) => {
     if (err) {
       res.json(getJsonFile(false, "login fail", null));

@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var goodsRouter = require('./routes/goods')
 var {getJsonFile} = require('./utils/index')
+var mongoose = require("mongoose");
 
 var app = express();
 
@@ -57,6 +58,37 @@ app.use(function(err, req, res) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+
+
+
+var Admin = mongoose.mongo.Admin;
+
+// let mongoURL = "mongodb+srv://admin:<password>@cluster0.lpdkl.mongodb.net/<dbname>?retryWrites=true&w=majority"
+// 连接数据库
+mongoose.connect("mongodb://root:654321@127.0.0.1:27017/vue_mall", {
+  useNewUrlParser: true
+});
+
+// mongoose.connect(mongoURL,{
+//   useNewUrlParser: true
+// })
+
+mongoose.connection.on("open", function() {
+  console.log("MongoDB connected success.");
+  new Admin(mongoose.connection.db).listDatabases(function(err, res) {
+    var allDatabases = res.databases;
+    console.log(allDatabases[4]);
+  });
+});
+
+mongoose.connection.on("error", function() {
+  console.log("MongoDB connected fail.");
+});
+
+mongoose.connection.on("disconnected", function() {
+  console.log("MongoDB connected disconnected.");
 });
 
 module.exports = app;
