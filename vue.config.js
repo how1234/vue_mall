@@ -27,9 +27,9 @@ module.exports = {
     svgRule
       .use('vue-svg-loader')
         .loader('vue-svg-loader')
-  }
+  },
   // 项目的基本路径
-  // publicPath:'/',
+  publicPath:'./'
   // 项目的生成目录
   // outputDir:'',
   // 修改index.html的路径
